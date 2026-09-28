@@ -7,7 +7,7 @@ class SubjectInfo extends StatelessWidget {
   final dynamic place;
   final dynamic prof;
   final dynamic period;
-  final String? link; // استقبال اللينك
+  final String? link; 
 
   const SubjectInfo({
     super.key,

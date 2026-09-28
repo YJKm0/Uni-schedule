@@ -155,6 +155,9 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                  builder: (_) => WeekViewPage(
+                  secNumber: selectedSection??1,
+                  selectedDate: selectedDate ,
+                  processor: widget.processor,
               
                 ),
               ),
@@ -220,6 +223,7 @@ class _HomePageState extends State<HomePage> {
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
+                      onTapOutside:(e)=>FocusScope.of(context).unfocus(),
                       onSubmitted: (_) => _validateAndFetch(),
                     ),
                   ),
