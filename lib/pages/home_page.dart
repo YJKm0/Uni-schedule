@@ -28,10 +28,10 @@ class _HomePageState extends State<HomePage> {
 
   final TextEditingController _secNumController = TextEditingController();
 
-  int selectedSection = 1;
+  int? selectedSection ;
+  
+  List<Schedule>? items;
   DateTime selectedDate = DateTime(2026, 9, 19);
-  List<Schedule> items = [];
-
   final DateTime _minDate = DateTime(2026, 9, 19);
   final DateTime _maxDate = DateTime(2027, 1, 1);
 
@@ -65,20 +65,24 @@ class _HomePageState extends State<HomePage> {
       selectedSection = defaultSec;
       _secNumController.text = defaultSec.toString();
       selectedDate = initialDate;
-      items = widget.processor.getScheduleForSection(selectedSection, selectedDate);
+      items = widget.processor.getScheduleForSection(selectedSection!, selectedDate);
     });
   }
+  void _validateAndFetch() {
+  final parsedSection = int.tryParse(_secNumController.text.trim());
+  
+  if (parsedSection == null) {
+    _secNumController.clear();
+    return;
+  }
 
+  setState(() {
+    selectedSection = parsedSection;
+    items = widget.processor.getScheduleForSection(parsedSection, selectedDate);
+  });
+}
   void onButtonPressed() {
-    var test = int.tryParse(_secNumController.text.trim());
-    if (test == null) {
-      _secNumController.text = "";
-      return;
-    }
-    setState(() {
-      selectedSection = test;
-      items = widget.processor.getScheduleForSection(selectedSection, selectedDate);
-    });
+    _validateAndFetch();
   }
 
   void onListItemeTapped(int index) {
@@ -86,11 +90,11 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return SubjectInfo(
-          name: items[index].subject,
-          prof: items[index].professor,
-          period: periods[items[index].period],
-          place: items[index].location ?? 'online',
-          link: items[index].teamsLink,
+          name: items![index].subject,
+          prof: items![index].professor,
+          period: periods[items![index].period],
+          place: items![index].location ?? 'online',
+          link: items![index].teamsLink,
         );
       },
     );
@@ -163,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       selectedDate = value;
                       if (_secNumController.text.isNotEmpty) {
-                        onButtonPressed();
+                        _validateAndFetch();
                       }
                     });
                   },
@@ -183,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(green: 0.03),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
@@ -199,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
-                      onSubmitted: (_) => onButtonPressed(),
+                      onSubmitted: (_) => _validateAndFetch(),
                     ),
                   ),
                 ),
@@ -221,62 +225,69 @@ class _HomePageState extends State<HomePage> {
 
           const SizedBox(height: 6),
           Expanded(
-            child: items.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.event_busy_outlined, size: 54, color: Colors.grey.shade400),
-                        const SizedBox(height: 10),
-                        Text(
-                          'No available Sections or lectures',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+  child: items == null
+      
+      ? const Center(
+          child: CircularProgressIndicator(color: Color(0xFF673AB7)),
+        )
+    
+      : items!.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.event_busy_outlined, size: 54, color: Colors.grey.shade400),
+                  const SizedBox(height: 10),
+                  Text(
+                    'No available Sections or lectures',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: items.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      final isOnline = item.location == null || item.location!.isEmpty;
-
-                      return Card(
-                        elevation: 0.5,
-                        color: Colors.white,
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: ListTile(
-                          onTap: () => onListItemeTapped(index),
-                          leading: CircleAvatar(
-                            backgroundColor: const Color(0xFFEDE7F6),
-                            child: Icon(
-                              isOnline ? Icons.language_outlined : Icons.account_balance_sharp,
-                              color: const Color(0xFF673AB7),
-                            ),
-                          ),
-                          title: Text(
-                            item.subject,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              '${item.location ?? 'Online'} • ${periods[item.period]} • ${item.professor}',
-                              style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-                            ),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-                        ),
-                      );
-                    },
                   ),
-          ),
+                ],
+              ),
+            )
+         
+          : ListView.builder(
+              itemCount: items!.length,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              itemBuilder: (context, index) {
+                final item = items![index];
+                final isOnline = item.location == null || item.location!.isEmpty;
+
+                return Card(
+                  elevation: 0.5,
+                  color: Colors.white,
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: ListTile(
+                    onTap: () => onListItemeTapped(index),
+                    leading: CircleAvatar(
+                      backgroundColor: const Color(0xFFEDE7F6),
+                      child: Icon(
+                        isOnline ? Icons.language_outlined : Icons.account_balance_sharp,
+                        color: const Color(0xFF673AB7),
+                      ),
+                    ),
+                    title: Text(
+                      item.subject,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        '${item.location ?? 'Online'} • ${periods[item.period]} • ${item.professor}',
+                        style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                      ),
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                  ),
+                );
+              },
+            ),
+)
         ],
       ),
     );
