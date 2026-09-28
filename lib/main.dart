@@ -26,8 +26,43 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      
+      localizationsDelegates: const [
+        CustomMaterialLocalizationsDelegate(),
+        DefaultWidgetsLocalizations.delegate,
+      ],  
       home: HomePage(processor: processor)
     );
   }
+}
+
+class CustomMaterialLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialLocalizations> {
+  const CustomMaterialLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<MaterialLocalizations> load(Locale locale) async =>
+      const _CustomMaterialLocalizations();
+
+  @override
+  bool shouldReload(CustomMaterialLocalizationsDelegate old) => false;
+}
+
+class _CustomMaterialLocalizations extends DefaultMaterialLocalizations {
+  const _CustomMaterialLocalizations();
+
+  @override
+  int get firstDayOfWeekIndex => 6; // 6 = السبت (0 = الأحد)
+  @override
+  List<String> get narrowWeekdays => const <String>[
+    'Sun', // 0 = الأحد
+    'Mon', // 1 = الإثنين
+    'Tue', // 2 = الثلاثاء
+    'Wed', // 3 = الأربعاء
+    'Thu', // 4 = الخميس
+    'Fri', // 5 = الجمعة
+    'Sat', // 6 = السبت
+  ];
 }

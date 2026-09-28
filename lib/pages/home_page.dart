@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uni_schudle_try1/modules/schedule_model.dart';
 import 'package:uni_schudle_try1/pages/settings_page.dart';
 import 'package:uni_schudle_try1/pages/subject_info.dart';
+import 'package:uni_schudle_try1/pages/week_view_page.dart';
 import 'package:uni_schudle_try1/services/processor.dart';
 
 class HomePage extends StatefulWidget {
@@ -146,6 +147,22 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
+        actions: [IconButton(
+          icon: const Icon(Icons.view_week_rounded),
+          tooltip: 'عرض الجدول الأسبوعي',
+          onPressed: () {
+             Navigator.push(
+                context,
+                MaterialPageRoute(
+                 builder: (_) => WeekViewPage(
+              
+                ),
+              ),
+            )  ;
+        },
+      ) ,
+
+      ],
       ),
       body: Column(
         children: [
