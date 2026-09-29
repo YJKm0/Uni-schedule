@@ -16,7 +16,7 @@ class DpSqlService {
     int savedVersion = prefs.getInt('db_version') ?? 0;
 
     if (!await databaseExists(path) || savedVersion < currentVersion) {
-      ByteData data = await rootBundle.load("assets/UniSchedule - second year.db");
+      ByteData data = await rootBundle.load("assets/UniSchedule__second _year.db");
       Uint8List bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
       if (kIsWeb) {

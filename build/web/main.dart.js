@@ -88271,7 +88271,7 @@ return A.N(A.asF().zx(m),$async$km)
 case 7:s=!b||k<1?5:6
 break
 case 5:s=8
-return A.N($.Ym().iH("assets/UniSchedule - second year.db"),$async$km)
+return A.N($.Ym().iH("assets/UniSchedule__second _year.db"),$async$km)
 case 8:p=b
 o=J.iT(B.at.gcB(p),p.byteOffset,p.byteLength)
 s=9
