@@ -1,31 +1,33 @@
 import 'dart:io';
-
-import 'package:flutter/foundation.dart'; // لمعرفة هل النظام ويب أم أندرويد
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uni_schudle_try1/modules/schedule_model.dart';
 
 class DpSqlService {
   Future<Database> loadDb() async {
     String dbPath = await getDatabasesPath();
     String path = join(dbPath, 'UniSchedule__second _year.db');
+    const int currentVersion = 1;
 
-    if (!await databaseExists(path)) {
-      ByteData data = await rootBundle.load("assets/UniSchedule__second _year.db");
+    final prefs = await SharedPreferences.getInstance();
+    int savedVersion = prefs.getInt('db_version') ?? 0;
+
+    if (!await databaseExists(path) || savedVersion < currentVersion) {
+      ByteData data = await rootBundle.load("assets/UniSchedule - second year.db");
       Uint8List bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
       if (kIsWeb) {
-      
         await databaseFactory.writeDatabaseBytes(path, bytes);
       } else {
-      
         await File(path).writeAsBytes(bytes, flush: true);
       }
+      await prefs.setInt('db_version', currentVersion);
     }
 
-    Database ydb = await openDatabase(path);
-    return ydb;
+    return await openDatabase(path);
   }
 
   Future<List<Schedule>> getSchedules() async {
