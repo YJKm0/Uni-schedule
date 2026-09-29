@@ -55,9 +55,9 @@ class _HomePageState extends State<HomePage> {
 
     DateTime initialDate = _minDate;
     if (alwaysToday) {
-      final now = DateTime.now();
-      if (now.isAfter(_minDate.subtract(const Duration(days: 1))) &&
-          now.isBefore(_maxDate.add(const Duration(days: 1)))) {
+      final now = DateUtils.dateOnly(DateTime.now());
+      // فحص سليم: هل اليوم يقع بين البداية والنهاية فعلاً؟
+      if (!now.isBefore(_minDate) && !now.isAfter(_maxDate)) {
         initialDate = now;
       }
     }

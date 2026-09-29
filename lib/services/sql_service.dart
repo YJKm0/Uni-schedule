@@ -9,10 +9,10 @@ import 'package:uni_schudle_try1/modules/schedule_model.dart';
 class DpSqlService {
   Future<Database> loadDb() async {
     String dbPath = await getDatabasesPath();
-    String path = join(dbPath, 'UniSchedule.db');
+    String path = join(dbPath, 'UniSchedule__second _year.db');
 
     if (!await databaseExists(path)) {
-      ByteData data = await rootBundle.load("assets/UniSchedule - second year.db");
+      ByteData data = await rootBundle.load("assets/UniSchedule__second _year.db");
       Uint8List bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
       if (kIsWeb) {
