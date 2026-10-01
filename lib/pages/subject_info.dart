@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uni_schudle_try1/modules/schedule_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SubjectInfo extends StatelessWidget {
-  final dynamic name;
-  final dynamic place;
-  final dynamic prof;
-  final dynamic period;
-  final String? link; 
+  final Schedule s;
+  final Map<int, String> periods = {
+    1: "8:30 Am => 10:10 Am",
+    2: "10:20 Am => 12:00 Pm",
+    3: "12:20 Pm => 2:00 Pm",
+    4: "2:10 Pm => 3:50 Pm",
+    5: "4:00 Pm => 5:40 Pm",
+    6: "5:50 pm => 7:30",
+    7: "7:30 Pm => 9:00 Pm",
+    8: "9:00 Pm => 10:30 Pm",
+  };
 
-  const SubjectInfo({
-    super.key,
-    this.name,
-    this.place,
-    this.prof,
-    this.period,
-    this.link,
+   SubjectInfo({
+    super.key, required this.s,
   });
+
   Future<void> _openLink(BuildContext context, String urlString) async {
     final Uri url = Uri.parse(urlString);
     try {
@@ -26,13 +29,13 @@ class SubjectInfo extends StatelessWidget {
       );
       if (!launched && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذر فتح الرابط')),
+          const SnackBar(content: Text('Could not open the link')),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في الرابط: $e')),
+          SnackBar(content: Text('Error opening the link: $e')),
         );
       }
     }
@@ -40,20 +43,21 @@ class SubjectInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLinkAvailable = link != null && 
-        link!.trim().isNotEmpty && 
-        link != 'Not Available' && 
-        link!.startsWith('http');
+    final colorScheme = Theme.of(context).colorScheme;
+    final bool isLinkAvailable = 
+        s.teamsLink.trim().isNotEmpty && 
+        s.teamsLink!= 'Not Available' && 
+        s.teamsLink.startsWith('http');
 
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         spacing: 8,
         children: [
-          const Icon(Icons.menu_book_rounded, color: Colors.deepPurple),
+          Icon(Icons.menu_book_rounded, color: colorScheme.primary),
           Expanded(
             child: Text(
-              name,
+              s.subject,
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -66,34 +70,34 @@ class SubjectInfo extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('المحاضر: $prof', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+            Text('Professor: ${s.professor}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            Text('المكان: $place', style: const TextStyle(fontSize: 14)),
+            Text('Place: ${s.location}', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 8),
-            Text('الفترة: $period', style: const TextStyle(fontSize: 14)),
-            if (place=='online')...[
+            Text('Period: ${periods[s.period]}', style: const TextStyle(fontSize: 14)),
+            if (s.location == 'Online')...[
                const Divider(height: 24),
-               const Text(
-                    'رابط الفترة (Teams):',
-                  style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
+               Text(
+                  'Teams Link:',
+                  style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
                 ),
               const SizedBox(height: 4),
                 if (isLinkAvailable)
                 InkWell(
-                  onTap: () => _openLink(context, link!),
+                  onTap: () => _openLink(context, s.teamsLink),
                   borderRadius: BorderRadius.circular(6),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                     spacing: 6,
                     children: [
-                      const Icon(Icons.link_rounded, color: Colors.blue, size: 20),
-                      const Expanded(
+                      Icon(Icons.link_rounded, color: colorScheme.primary, size: 20),
+                      Expanded(
                         child: Text(
-                          'اضغط هنا للانضمام للفترة',
+                          'Click here to join Teams meeting',
                           style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 14,
+                            color: colorScheme.primary,
+                            fontSize: 12.7,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                           ),
@@ -101,29 +105,29 @@ class SubjectInfo extends StatelessWidget {
                       ),
                       IconButton(onPressed: () async {
                          await Clipboard.setData(
-                            ClipboardData(text:  link?? ''),);
+                            ClipboardData(text:  s.teamsLink),);
                              if (context.mounted) {
                                ScaffoldMessenger.of(context).showSnackBar(
                                  const SnackBar(
-                                  content: Text('تم النسخ إلى الحافظة!'),
+                                  content: Text('Copied to clipboard'),
                                    duration: Duration(seconds: 2),
                                   ),
                                 );
                             } 
                           },
-                      icon: Icon(Icons.copy,color: Colors.blue, size: 20))
+                      icon: Icon(Icons.copy, color: colorScheme.primary, size: 20))
                     ],
                   ),
                 ),
               )
                 else
-                 const Row(
+                 Row(
                    children: [
-                    Icon(Icons.link_off_rounded, color: Colors.grey, size: 20),
-                    SizedBox(width: 6),
+                    Icon(Icons.link_off_rounded, color: colorScheme.onSurface.withValues(alpha: 0.5), size: 20),
+                    const SizedBox(width: 6),
                     Text(
-                      'الرابط غير متاح حالياً',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                      'Link is Not available right now',
+                      style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 14),
                     ),
                 ],
               ),
@@ -136,7 +140,7 @@ class SubjectInfo extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('إغلاق'),
+          child: const Text('Close'),
         ),
       ],
     );

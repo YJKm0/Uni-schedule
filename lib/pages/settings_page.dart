@@ -20,7 +20,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadSettings();
   }
 
-  // تحميل القيم المحفوظة
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -30,7 +29,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  // حفظ حالة تاريخ اليوم (bool)
   Future<void> _updateAlwaysToday(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('always_today', value);
@@ -39,7 +37,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  // حفظ رقم السكشن الافتراضي (int)
   Future<void> _updateDefaultSection(int section) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('default_section', section);
@@ -48,18 +45,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  // نافذة لاختيار رقم السكشن
   void _showSectionPickerDialog() {
     final textController = TextEditingController(text: _defaultSection.toString());
+    final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFFF7F5FA),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text(
-            'تحديد السكشن الافتراضي',
+            'Set Default Section',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           content: TextField(
@@ -68,19 +64,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             autofocus: true,
             decoration: const InputDecoration(
-              hintText: 'أدخل رقم السكشن (مثلاً 47)',
+              hintText: 'Enter section number (e.g. 39)',
               border: OutlineInputBorder(),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+              child: Text('Cancel', style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6))),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF673AB7),
-                foregroundColor: Colors.white,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
               ),
               onPressed: () {
                 final newSection = int.tryParse(textController.text);
@@ -89,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 }
                 Navigator.pop(context);
               },
-              child: const Text('حفظ'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -99,46 +95,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFBCAAA4),
       appBar: AppBar(
-        title: const Text('الإعدادات', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF673AB7),
-        foregroundColor: Colors.white,
+        title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF673AB7)))
+          ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // 1. خيار السكشن الافتراضي
                 Card(
-                  elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFEDE7F6),
-                      child: Icon(Icons.group_outlined, color: Color(0xFF673AB7)),
+                    leading: CircleAvatar(
+                      backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
+                      child: Icon(Icons.group_outlined, color: colorScheme.primary),
                     ),
                     title: const Text(
-                      'السكشن الافتراضي',
+                      'Default Section',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
-                    subtitle: const Text(
-                      'السكشن الذي سيتم تحميل جدوله وتحديده تلقائياً عند فتح التطبيق.',
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
+                    subtitle: Text(
+                      'The section that will be loaded and selected automatically when opening the app.',
+                      style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13),
                     ),
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEDE7F6),
+                        color: colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         '$_defaultSection',
-                        style: const TextStyle(
-                          color: Color(0xFF673AB7),
+                        style: TextStyle(
+                          color: colorScheme.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -150,29 +142,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 const SizedBox(height: 12),
 
-                // 2. خيار تاريخ اليوم التلقائي
                 Card(
-                  elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: SwitchListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    activeThumbColor: const Color(0xFF673AB7),
-                    secondary: const CircleAvatar(
-                      backgroundColor: Color(0xFFEDE7F6),
-                      child: Icon(Icons.today_outlined, color: Color(0xFF673AB7)),
+                    activeThumbColor: colorScheme.primary,
+                    secondary: CircleAvatar(
+                      backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
+                      child: Icon(Icons.today_outlined, color: colorScheme.primary),
                     ),
                     title: const Text(
-                      'البدء بتاريخ اليوم',
+                      'Start with Today\'s Date',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
-                    subtitle: const Text(
-                      'فتح التقويم تلقائياً على تاريخ اليوم الحالي في كل مرة تفتح فيها التطبيق.',
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
+                    subtitle: Text(
+                      'Automatically open the calendar to today\'s date every time you open the app.',
+                      style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13),
                     ),
                     value: _alwaysToday,
                     onChanged: _updateAlwaysToday,
                   ),
                 ),
+                
               ],
             ),
     );

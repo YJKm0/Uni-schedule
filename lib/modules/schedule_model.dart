@@ -8,7 +8,7 @@ class Schedule
   final int weekType;
   final int period;
   final String day;
-  final String? location; 
+  final String location; 
   final String professor;
   final int type;
   final String teamsLink;
@@ -22,7 +22,7 @@ class Schedule
   required this.weekType,
   required this.period,
   required this.day,
-  this.location,
+  required this.location,
   required this.professor,
   required this.type, 
   required this.teamsLink
@@ -37,10 +37,10 @@ class Schedule
     weekType: map['WeekType'],
     period: map['Period'],
     day: map['Day'],
-    location: map['Location'] as String?, 
+    location: map['Location'] , 
     professor: map['Professor'],
     type: map['Type'],
-    teamsLink: map['TeamsLink'] ?? 'Not Available'
+    teamsLink: map['TeamsLink'] 
   );
 }
 

@@ -45,6 +45,11 @@ int calculateWeekType (int weekNumber){
   }
   return weekType ;
 }
+DateTime getSaturdayOfWeek(DateTime date) {
+  int daysToSubtract = (date.weekday + 1) % 7;
+  DateTime saturday = date.subtract(Duration(days: daysToSubtract));
+  return DateTime(saturday.year, saturday.month, saturday.day);
+}
 List<Schedule> getScheduleForSection(int sectionNumber, DateTime selectedDate)
 {
   
@@ -60,10 +65,4 @@ List<Schedule> getScheduleForSection(int sectionNumber, DateTime selectedDate)
     ).toList()..sort((a, b) => a.period.compareTo(b.period));
     return result ;
 }
-
-
-
-
-
-
 }

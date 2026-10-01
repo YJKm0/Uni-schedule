@@ -6,6 +6,8 @@ import 'package:uni_schudle_try1/services/processor.dart';
 import 'package:uni_schudle_try1/services/sql_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:uni_schudle_try1/theme/app_theme.dart';
+
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
@@ -25,6 +27,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         CustomMaterialLocalizationsDelegate(),

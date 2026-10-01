@@ -34,11 +34,15 @@ class DpSqlService {
     Database db = await loadDb();
     List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT 
-        s.*, 
-        IFNULL(l.TeamsLink, 'Not Available') AS TeamsLink
-      FROM Schedules s
-      LEFT JOIN OnlineLinks l 
-        ON s.Professor = l.Professor
+   s.*,
+   CASE 
+     WHEN s.Location IS NULL OR s.Location = 'null' OR TRIM(s.Location) = '' THEN 'Online' 
+     ELSE s.Location 
+   END AS Location,
+   IFNULL(l.TeamsLink, 'Not Available') AS TeamsLink
+FROM Schedules s
+LEFT JOIN OnlineLinks l
+   ON s.Professor = l.Professor
     ''');
 
     return result.map((row) => Schedule.maping(row)).toList();
