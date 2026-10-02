@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,14 +11,19 @@ class DpSqlService {
   Future<Database> loadDb() async {
     String dbPath = await getDatabasesPath();
     String path = join(dbPath, 'UniSchedule__second _year.db');
-    const int currentVersion = 1;
+    const int currentVersion = 2;
 
     final prefs = await SharedPreferences.getInstance();
     int savedVersion = prefs.getInt('db_version') ?? 0;
 
     if (!await databaseExists(path) || savedVersion < currentVersion) {
-      ByteData data = await rootBundle.load("assets/UniSchedule__second _year.db");
-      Uint8List bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      ByteData data = await rootBundle.load(
+        "assets/UniSchedule__second _year.db",
+      );
+      Uint8List bytes = data.buffer.asUint8List(
+        data.offsetInBytes,
+        data.lengthInBytes,
+      );
 
       if (kIsWeb) {
         await databaseFactory.writeDatabaseBytes(path, bytes);

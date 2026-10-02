@@ -26694,7 +26694,7 @@ yz:function yz(a,b){this.c=a
 this.a=b},
 DR:function DR(a,b,c,d,e){var _=this
 _.d=a
-_.e=!0
+_.e=!1
 _.f=b
 _.w=_.r=null
 _.x=c
@@ -89601,7 +89601,7 @@ k=A.eb(l.a.h(0,"db_version"))
 if(k==null)k=0
 s=7
 return A.O(A.atv().zL(m),$async$kt)
-case 7:s=!b||k<1?5:6
+case 7:s=!b||k<2?5:6
 break
 case 5:s=8
 return A.O($.YJ().iN("assets/UniSchedule__second _year.db"),$async$kt)
@@ -89610,7 +89610,7 @@ o=J.iW(B.ax.gcG(p),p.byteOffset,p.byteLength)
 s=9
 return A.O(A.atv().Cn(m,o),$async$kt)
 case 9:s=10
-return A.O(l.G9("Int","db_version",1),$async$kt)
+return A.O(l.G9("Int","db_version",2),$async$kt)
 case 10:case 6:n=A.aC6(null,null,null,null,null,!1,null,!0,null)
 s=11
 return A.O(A.atv().Bo(m,n),$async$kt)
