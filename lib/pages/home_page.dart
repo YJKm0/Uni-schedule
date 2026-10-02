@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:uni_schudle_try1/pages/settings_page.dart';
 import 'package:uni_schudle_try1/pages/subject_info.dart';
 import 'package:uni_schudle_try1/pages/week_view_page.dart';
