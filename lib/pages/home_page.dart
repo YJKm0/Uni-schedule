@@ -186,10 +186,10 @@ class _HomePageState extends State<HomePage> {
                           ),
                           onTapOutside: (e) {
                             FocusScope.of(context).unfocus();
-                            _secNumController.clear();
                           },
                           onSubmitted: (_) {
                             vm.updateSection(_secNumController.text);
+                            _secNumController.clear();
                           },
                         ),
                       ),
@@ -211,6 +211,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () {
                         vm.updateSection(_secNumController.text);
+                        _secNumController.clear();
                       },
                       child: const Text(
                         'Enter',
