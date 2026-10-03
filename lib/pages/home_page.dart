@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:uni_schudle_try1/core/constants.dart';
+import 'package:uni_schudle_try1/core/locator.dart';
+import 'package:uni_schudle_try1/modules/schedule_model.dart';
+
 import 'package:uni_schudle_try1/pages/settings_page.dart';
 import 'package:uni_schudle_try1/pages/subject_info.dart';
-import 'package:uni_schudle_try1/pages/week_view_page.dart';
+//import 'package:uni_schudle_try1/pages/week_view_page.dart';
 import 'package:uni_schudle_try1/view_models/schedule_view_model.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,27 +17,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedSection = 39;
-  DateTime selectedDate = DateTime.now();
   final TextEditingController _secNumController = TextEditingController();
-  final Map<int, String> periods = {
-    1: "8:30 Am => 10:10 Am",
-    2: "10:20 Am => 12:00 Pm",
-    3: "12:20 Pm => 2:00 Pm",
-    4: "2:10 Pm => 3:50 Pm",
-    5: "4:00 Pm => 5:40 Pm",
-    6: "5:50 pm => 7:30",
-    7: "7:30 Pm => 9:00 Pm",
-    8: "9:00 Pm => 10:30 Pm",
-  };
+  ScheduleViewModel vm = locator<ScheduleViewModel>()..loadInitialData();
   bool isWeekView = false;
-  final DateTime _minDate = DateTime(2026, 9, 19);
-  final DateTime _maxDate = DateTime(2027, 1, 1);
 
   @override
   void initState() {
     super.initState();
-    _loadSavedSettings();
   }
 
   @override
@@ -43,34 +32,11 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Future<void> _loadSavedSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final defaultSec = prefs.getInt('default_section') ?? 1;
-    final alwaysToday = prefs.getBool('always_today') ?? true;
-
-    DateTime initialDate = _minDate;
-    if (alwaysToday) {
-      final now = DateUtils.dateOnly(DateTime.now());
-      if (!now.isBefore(_minDate) && !now.isAfter(_maxDate)) {
-        initialDate = now;
-      }
-    }
-    setState(() {
-      selectedSection = defaultSec;
-      _secNumController.text = defaultSec.toString();
-      selectedDate = initialDate;
-    });
-  }
-
-  void onButtonPressed() {
-    updateSection();
-  }
-
-  void onListItemeTapped(dynamic items, int index) {
+  void onListItemeTapped(Schedule item) {
     showDialog(
       context: context,
       builder: (context) {
-        return SubjectInfo(s: items[index]);
+        return SubjectInfo(s: item);
       },
     );
   }
@@ -101,7 +67,9 @@ class _HomePageState extends State<HomePage> {
                       builder: (context) => const SettingsScreen(),
                     ),
                   );
-                  _loadSavedSettings();
+                  if (context.mounted) {
+                    vm.loadDefualts();
+                  }
                 },
               ),
               const Spacer(),
@@ -143,9 +111,10 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Consumer<ScheduleViewModel>(
-        builder: (context, viewModel, child) {
-          if (viewModel.isLoading) {
+      body: ListenableBuilder(
+        listenable: vm,
+        builder: (context, _) {
+          if (vm.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
           if (isWeekView) {
@@ -164,7 +133,7 @@ class _HomePageState extends State<HomePage> {
               startweek: viewModel.getSaturdayOfWeek(selectedDate),
             );*/
           }
-          final items = viewModel.getSchedule(selectedSection, selectedDate);
+          final items = vm.getSchedule();
           return Column(
             children: [
               myCalander(),
@@ -176,6 +145,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: Row(
                   children: [
+                    Text('${vm.currentSectionNumber}'),
+                    SizedBox(width: 10),
                     //Section Number txt Feild
                     Expanded(
                       child: Container(
@@ -194,6 +165,7 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         child: TextField(
+                          autofocus: false,
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: false,
                             signed: false,
@@ -217,8 +189,13 @@ class _HomePageState extends State<HomePage> {
                               vertical: 14,
                             ),
                           ),
-                          onTapOutside: (e) => FocusScope.of(context).unfocus(),
-                          onSubmitted: (_) => {updateSection()},
+                          onTapOutside: (e) {
+                            FocusScope.of(context).unfocus();
+                            _secNumController.clear();
+                          },
+                          onSubmitted: (_) {
+                            vm.updateSection(_secNumController.text);
+                          },
                         ),
                       ),
                     ),
@@ -237,7 +214,9 @@ class _HomePageState extends State<HomePage> {
                           vertical: 14,
                         ),
                       ),
-                      onPressed: onButtonPressed,
+                      onPressed: () {
+                        vm.updateSection(_secNumController.text);
+                      },
                       child: const Text(
                         'Enter',
                         style: TextStyle(
@@ -291,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             child: ListTile(
-                              onTap: () => onListItemeTapped(items, index),
+                              onTap: () => onListItemeTapped(item),
                               leading: CircleAvatar(
                                 backgroundColor: colorScheme.primary.withValues(
                                   alpha: 0.12,
@@ -313,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Text(
-                                  '${item.location} • ${periods[item.period]} • ${item.professor}',
+                                  '${item.location} • ${AcademicConstants.periods[item.period]} • ${item.professor}',
                                   style: TextStyle(
                                     color: colorScheme.onSurface.withValues(
                                       alpha: 0.65,
@@ -348,33 +327,17 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: CalendarDatePicker(
-            key: ValueKey(selectedDate),
-            firstDate: _minDate,
-            lastDate: _maxDate,
+            key: ValueKey(vm.selectedDate),
+            firstDate: AcademicConstants.minDate,
+            lastDate: AcademicConstants.maxDate,
             initialCalendarMode: DatePickerMode.day,
-            initialDate: selectedDate,
+            initialDate: vm.selectedDate,
             onDateChanged: (DateTime value) {
-              setState(() {
-                selectedDate = value;
-                if (_secNumController.text.isNotEmpty) {
-                  updateSection();
-                }
-              });
+              vm.updateSelectedDate(value);
             },
           ),
         ),
       ),
     );
-  }
-
-  void updateSection() {
-    final parsedSection = int.tryParse(_secNumController.text.trim());
-    if (parsedSection != null) {
-      setState(() {
-        selectedSection = parsedSection;
-      });
-    } else {
-      _secNumController.text = selectedSection.toString();
-    }
   }
 }

@@ -1,7 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uni_schudle_try1/core/constants.dart';
 import 'package:uni_schudle_try1/modules/schedule_model.dart';
 
 class Processor {
   List<Schedule> schedules;
+
   Processor(this.schedules);
   Map<int, String> dayOfTheWeek = {
     DateTime.saturday: 'Saturday',
@@ -12,6 +16,8 @@ class Processor {
     DateTime.thursday: 'Thursday',
     DateTime.friday: 'Friday',
   };
+  
+
   int calculateSectionType(int sectionNumber) {
     int sectionType;
     if (sectionNumber % 2 == 0) {

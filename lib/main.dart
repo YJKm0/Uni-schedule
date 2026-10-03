@@ -23,23 +23,16 @@ class MainApp extends StatelessWidget {
   const MainApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (BuildContext context) {
-        final viewModel = locator<ScheduleViewModel>();
-        viewModel.loadInitialData();
-        return viewModel;
-      },
-      child: MaterialApp(
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: const [
-          CustomMaterialLocalizationsDelegate(),
-          DefaultWidgetsLocalizations.delegate,
-        ],
-        home: HomePage(),
-      ),
+    return MaterialApp(
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        CustomMaterialLocalizationsDelegate(),
+        DefaultWidgetsLocalizations.delegate,
+      ],
+      home: HomePage(),
     );
   }
 }
