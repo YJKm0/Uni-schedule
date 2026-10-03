@@ -1,41 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:uni_schudle_try1/modules/schedule_model.dart';
+import 'package:uni_schudle_try1/core/locator.dart';
+
 import 'package:uni_schudle_try1/pages/home_page.dart';
-import 'package:uni_schudle_try1/services/processor.dart';
-import 'package:uni_schudle_try1/services/sql_service.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:uni_schudle_try1/theme/app_theme.dart';
+import 'package:uni_schudle_try1/view_models/app_view_model.dart';
 
-void main()async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }
-  DpSqlService dpSqlService = DpSqlService();
-  List<Schedule> schedules = await dpSqlService.getSchedules();
-  Processor processor  = Processor(schedules);
-  runApp( MainApp(processor: processor,));
+  setupLocator();
+  locator<AppVm>().loadtheme();
+
+  runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  final Processor processor;
-
-  const MainApp({super.key, required this.processor});
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        CustomMaterialLocalizationsDelegate(),
-        DefaultWidgetsLocalizations.delegate,
-      ],  
-      home: HomePage(processor: processor)
+    return ListenableBuilder(
+      listenable: locator<AppVm>(),
+      builder: (BuildContext context, _) {
+        return MaterialApp(
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: locator<AppVm>().themeMode,
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: const [
+            CustomMaterialLocalizationsDelegate(),
+            DefaultWidgetsLocalizations.delegate,
+          ],
+          home: HomePage(),
+        );
+      },
     );
   }
 }

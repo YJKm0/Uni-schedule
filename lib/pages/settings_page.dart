@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:uni_schudle_try1/core/locator.dart';
+import 'package:uni_schudle_try1/view_models/app_view_model.dart';
+import 'package:uni_schudle_try1/view_models/settings_view_model.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -10,50 +13,27 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _defaultSection = 1;
-  bool _alwaysToday = true;
-  bool _isLoading = true;
+  final SettingsVm settingsVm = locator<SettingsVm>();
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _defaultSection = prefs.getInt('default_section') ?? 1;
-      _alwaysToday = prefs.getBool('always_today') ?? true;
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _updateAlwaysToday(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('always_today', value);
-    setState(() {
-      _alwaysToday = value;
-    });
-  }
-
-  Future<void> _updateDefaultSection(int section) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('default_section', section);
-    setState(() {
-      _defaultSection = section;
-    });
+    settingsVm.loadInitialSettings();
   }
 
   void _showSectionPickerDialog() {
-    final textController = TextEditingController(text: _defaultSection.toString());
+    final textController = TextEditingController(
+      text: settingsVm.defaultSection.toString(),
+    );
     final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text(
             'Set Default Section',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -71,7 +51,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6))),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -81,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () {
                 final newSection = int.tryParse(textController.text);
                 if (newSection != null && newSection > 0) {
-                  _updateDefaultSection(newSection);
+                  settingsVm.updateDefaultSection(newSection);
                 }
                 Navigator.pop(context);
               },
@@ -99,36 +84,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Settings',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
+      body: ListenableBuilder(
+        listenable: settingsVm,
+        builder: (context, _) {
+          if (settingsVm.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                //Section Default
                 Card(
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     leading: CircleAvatar(
-                      backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
-                      child: Icon(Icons.group_outlined, color: colorScheme.primary),
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      child: Icon(
+                        Icons.group_outlined,
+                        color: colorScheme.primary,
+                      ),
                     ),
                     title: const Text(
                       'Default Section',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     subtitle: Text(
                       'The section that will be loaded and selected automatically when opening the app.',
-                      style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: 13,
+                      ),
                     ),
                     trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '$_defaultSection',
+                        '${settingsVm.defaultSection}',
                         style: TextStyle(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -141,30 +151,122 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
 
                 const SizedBox(height: 12),
-
+                //AlwaysTodayToggle
                 Card(
                   child: SwitchListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     activeThumbColor: colorScheme.primary,
                     secondary: CircleAvatar(
-                      backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
-                      child: Icon(Icons.today_outlined, color: colorScheme.primary),
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      child: Icon(
+                        Icons.today_outlined,
+                        color: colorScheme.primary,
+                      ),
                     ),
                     title: const Text(
                       'Start with Today\'s Date',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     subtitle: Text(
                       'Automatically open the calendar to today\'s date every time you open the app.',
-                      style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: 13,
+                      ),
                     ),
-                    value: _alwaysToday,
-                    onChanged: _updateAlwaysToday,
+                    value: settingsVm.alwaysToday,
+                    onChanged: settingsVm.updateAlwaysToday,
                   ),
                 ),
-                
+
+                Card(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    leading: CircleAvatar(
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      child: Icon(
+                        Icons.palette_outlined,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    title: const Text('App Theme'),
+                    trailing: PopupMenuButton<ThemeMode>(
+                      initialValue: settingsVm.appTheme,
+                      tooltip: 'Select Theme',
+                      onSelected: (value) {
+                        settingsVm.updateApptheme(value);
+                        locator<AppVm>().loadtheme();
+                      },
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<ThemeMode>>[
+                            const PopupMenuItem<ThemeMode>(
+                              value: ThemeMode.system,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.brightness_auto, size: 20),
+                                  SizedBox(width: 10),
+                                  Text('System'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem<ThemeMode>(
+                              value: ThemeMode.light,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.light_mode_outlined, size: 20),
+                                  SizedBox(width: 10),
+                                  Text('Light'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem<ThemeMode>(
+                              value: ThemeMode.dark,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.dark_mode_outlined, size: 20),
+                                  SizedBox(width: 10),
+                                  Text('Dark'),
+                                ],
+                              ),
+                            ),
+                          ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            settingsVm.appTheme.name.toUpperCase(),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            color: colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 }
