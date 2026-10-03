@@ -8,7 +8,7 @@ import 'package:uni_schudle_try1/pages/subject_info.dart';
 import 'package:uni_schudle_try1/view_models/schedule_view_model.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
               },
               secNumber: selectedSection,
               selectedDate: selectedDate,
-              processor: viewModel.getProcessor(), // هنحتاج نعدلها بعدين
+              processor: viewModel.getProcessor(), 
               startweek: viewModel.getSaturdayOfWeek(selectedDate),
             );*/
           }
