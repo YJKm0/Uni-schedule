@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uni_schudle_try1/core/constants.dart';
 import 'package:uni_schudle_try1/modules/schedule_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SubjectInfo extends StatelessWidget {
   final Schedule s;
-  final Map<int, String> periods = {
-    1: "8:30 Am => 10:10 Am",
-    2: "10:20 Am => 12:00 Pm",
-    3: "12:20 Pm => 2:00 Pm",
-    4: "2:10 Pm => 3:50 Pm",
-    5: "4:00 Pm => 5:40 Pm",
-    6: "5:50 pm => 7:30",
-    7: "7:30 Pm => 9:00 Pm",
-    8: "9:00 Pm => 10:30 Pm",
-  };
 
-  SubjectInfo({super.key, required this.s});
+  const SubjectInfo({super.key, required this.s});
 
   Future<void> _openLink(BuildContext context, String urlString) async {
     final Uri url = Uri.parse(urlString);
@@ -76,7 +67,7 @@ class SubjectInfo extends StatelessWidget {
             Text('Place: ${s.location}', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 8),
             Text(
-              'Period: ${periods[s.period]}',
+              'Period: ${AcademicConstants.periods[s.period]}',
               style: const TextStyle(fontSize: 14),
             ),
             if (s.location == 'Online') ...[

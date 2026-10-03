@@ -7,28 +7,28 @@ import 'package:uni_schudle_try1/services/defaultsettings_service.dart';
 import 'package:uni_schudle_try1/services/processor.dart';
 import 'package:uni_schudle_try1/services/sql_service.dart';
 
-class ScheduleViewModel extends ChangeNotifier {
+class ScheduleVm extends ChangeNotifier {
   final DpSqlService _sqlService;
-  final DefaultsettingsService dss;
+  final DefaultsettingsService defaultsettingsService;
   Processor? _processor;
-
   bool isLoading = true;
   String? errorMessage;
   int? defaultSectionNumber;
   int? currentSectionNumber;
   DateTime? selectedDate;
   bool? isAlwaysToday;
+  bool isWeekView = false;
 
-  ScheduleViewModel(this._sqlService, this.dss);
+  ScheduleVm(this._sqlService, this.defaultsettingsService);
 
   //view methods
   Future<void> loadInitialData() async {
     try {
+      if (_processor != null) return;
       isLoading = true;
       notifyListeners();
 
       List<Schedule> schedules = await _sqlService.getSchedules();
-
       await loadDefualts();
       _processor = Processor(schedules);
       isLoading = false;
@@ -41,7 +41,8 @@ class ScheduleViewModel extends ChangeNotifier {
   }
 
   Future<void> loadDefualts() async {
-    DefaultsSettings defaults = await dss.loadSavedSettings();
+    DefaultsSettings defaults = await defaultsettingsService
+        .loadSavedSettings();
     defaultSectionNumber = defaults.defaultSection;
     currentSectionNumber = defaultSectionNumber;
     isAlwaysToday = defaults.isAlwaysToday;
@@ -78,6 +79,11 @@ class ScheduleViewModel extends ChangeNotifier {
 
   void updateSelectedDate(DateTime v) {
     selectedDate = v;
+    notifyListeners();
+  }
+
+  void toggleViewMode() {
+    isWeekView = !isWeekView;
     notifyListeners();
   }
 

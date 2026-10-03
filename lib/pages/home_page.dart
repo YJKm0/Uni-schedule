@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-
 import 'package:uni_schudle_try1/core/constants.dart';
 import 'package:uni_schudle_try1/core/locator.dart';
 import 'package:uni_schudle_try1/modules/schedule_model.dart';
-
 import 'package:uni_schudle_try1/pages/settings_page.dart';
 import 'package:uni_schudle_try1/pages/subject_info.dart';
 //import 'package:uni_schudle_try1/pages/week_view_page.dart';
 import 'package:uni_schudle_try1/view_models/schedule_view_model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,12 +16,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _secNumController = TextEditingController();
-  ScheduleViewModel vm = locator<ScheduleViewModel>()..loadInitialData();
-  bool isWeekView = false;
-
+  final ScheduleVm vm = locator<ScheduleVm>();
   @override
   void initState() {
     super.initState();
+    vm.loadInitialData();
   }
 
   @override
@@ -32,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void onListItemeTapped(Schedule item) {
+  void onListItemeTapped(BuildContext context, Schedule item) {
     showDialog(
       context: context,
       builder: (context) {
@@ -97,19 +94,17 @@ class _HomePageState extends State<HomePage> {
           'Uni Schedule',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        actions: [
+        /*actions: [
           IconButton(
             icon: Icon(
-              isWeekView ? Icons.calendar_view_day : Icons.view_week_rounded,
+              vm.isWeekView ? Icons.calendar_view_day : Icons.view_week_rounded,
             ),
             tooltip: 'Toggle View',
             onPressed: () {
-              setState(() {
-                isWeekView = !isWeekView;
-              });
+              vm.toggleViewMode();
             },
           ),
-        ],
+        ],*/
       ),
       body: ListenableBuilder(
         listenable: vm,
@@ -117,7 +112,7 @@ class _HomePageState extends State<HomePage> {
           if (vm.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (isWeekView) {
+          if (vm.isWeekView) {
             return Placeholder();
             /*
             return WeekViewPage(
@@ -136,7 +131,7 @@ class _HomePageState extends State<HomePage> {
           final items = vm.getSchedule();
           return Column(
             children: [
-              myCalander(),
+              MyCalander(),
 
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -270,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             child: ListTile(
-                              onTap: () => onListItemeTapped(item),
+                              onTap: () => onListItemeTapped(context, item),
                               leading: CircleAvatar(
                                 backgroundColor: colorScheme.primary.withValues(
                                   alpha: 0.12,
@@ -319,8 +314,14 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
 
-  Widget myCalander() {
+class MyCalander extends StatelessWidget {
+  final vm = locator<ScheduleVm>();
+  MyCalander({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Card(
