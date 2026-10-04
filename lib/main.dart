@@ -29,6 +29,7 @@ class MainApp extends StatelessWidget {
       listenable: locator<AppVm>(),
       builder: (BuildContext context, _) {
         return MaterialApp(
+          title: 'University Schedule',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: locator<AppVm>().themeMode,
