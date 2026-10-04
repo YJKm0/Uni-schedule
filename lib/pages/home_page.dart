@@ -4,6 +4,7 @@ import 'package:uni_schudle_try1/core/locator.dart';
 import 'package:uni_schudle_try1/modules/schedule_model.dart';
 import 'package:uni_schudle_try1/pages/settings_page.dart';
 import 'package:uni_schudle_try1/pages/subject_info.dart';
+
 //import 'package:uni_schudle_try1/pages/week_view_page.dart';
 import 'package:uni_schudle_try1/view_models/schedule_view_model.dart';
 
@@ -20,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
     vm.loadInitialData();
   }
 
@@ -65,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                   if (context.mounted) {
-                    vm.loadDefualts();
+                    await vm.loadDefaults();
                   }
                 },
               ),

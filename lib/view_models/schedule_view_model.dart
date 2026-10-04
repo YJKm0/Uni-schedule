@@ -29,7 +29,7 @@ class ScheduleVm extends ChangeNotifier {
       notifyListeners();
 
       List<Schedule> schedules = await _sqlService.getSchedules();
-      await loadDefualts();
+      await loadDefaults();
       _processor = Processor(schedules);
       isLoading = false;
       notifyListeners();
@@ -40,7 +40,7 @@ class ScheduleVm extends ChangeNotifier {
     }
   }
 
-  Future<void> loadDefualts() async {
+  Future<void> loadDefaults() async {
     DefaultsSettings defaults = await defaultsettingsService
         .loadSavedSettings();
     defaultSectionNumber = defaults.defaultSection;
