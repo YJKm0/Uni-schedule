@@ -88957,8 +88957,11 @@ A.fG(o,!1).oM(null)
 p=A.aAK(new A.am1(),null,t.z)
 s=2
 return A.H(A.fG(o,!1).lv(p),$async$$0)
-case 2:if(o.e!=null)q.a.e.vE()
-return A.J(null,r)}})
+case 2:s=o.e!=null?3:4
+break
+case 3:s=5
+return A.H(q.a.e.vE(),$async$$0)
+case 5:case 4:return A.J(null,r)}})
 return A.K($async$$0,r)},
 $S:21}
 A.am1.prototype={
@@ -89199,7 +89202,7 @@ k=A.eu(l.a.h(0,"db_version"))
 if(k==null)k=0
 s=7
 return A.H(A.atr().zP(m),$async$kt)
-case 7:s=!b||k<2?5:6
+case 7:s=!b||k<3?5:6
 break
 case 5:s=8
 return A.H($.YZ().iO("assets/UniSchedule__second _year.db"),$async$kt)
@@ -89208,7 +89211,7 @@ o=J.iY(B.ax.gcD(p),p.byteOffset,p.byteLength)
 s=9
 return A.H(A.atr().Cy(m,o),$async$kt)
 case 9:s=10
-return A.H(l.yv("Int","db_version",2),$async$kt)
+return A.H(l.yv("Int","db_version",3),$async$kt)
 case 10:case 6:n=A.aC9(null,null,null,null,null,!1,null,!0,null)
 s=11
 return A.H(A.atr().Bz(m,n),$async$kt)

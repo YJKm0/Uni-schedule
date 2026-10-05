@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:uni_schudle_try1/modules/schedule_model.dart';
 
 class DpSqlService {
   Future<Database> loadDb() async {
     String dbPath = await getDatabasesPath();
     String path = join(dbPath, 'UniSchedule__second _year.db');
-    const int currentVersion = 2;
+    const int currentVersion = 3;
 
     final prefs = await SharedPreferences.getInstance();
     int savedVersion = prefs.getInt('db_version') ?? 0;
