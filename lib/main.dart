@@ -1,16 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:uni_schudle_try1/core/locator.dart';
-
-import 'package:uni_schudle_try1/pages/home_page.dart';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:uni_schudle_try1/core/locator.dart';
+import 'package:uni_schudle_try1/pages/home_page.dart';
 import 'package:uni_schudle_try1/theme/app_theme.dart';
 import 'package:uni_schudle_try1/view_models/app_view_model.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isLinux || Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }

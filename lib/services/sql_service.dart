@@ -28,6 +28,8 @@ class DpSqlService {
       if (kIsWeb) {
         await databaseFactory.writeDatabaseBytes(path, bytes);
       } else {
+        final file = File(path);
+        await file.parent.create(recursive: true);
         await File(path).writeAsBytes(bytes, flush: true);
       }
       await prefs.setInt('db_version', currentVersion);
