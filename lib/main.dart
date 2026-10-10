@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -11,10 +9,6 @@ import 'package:uni_schudle_try1/view_models/app_view_model.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isLinux || Platform.isWindows) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }
@@ -33,6 +27,7 @@ class MainApp extends StatelessWidget {
       listenable: locator<AppVm>(),
       builder: (BuildContext context, _) {
         return MaterialApp(
+          title: 'UniSchedule',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: locator<AppVm>().themeMode,
