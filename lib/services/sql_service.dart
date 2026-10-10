@@ -11,7 +11,7 @@ class DpSqlService {
   Future<Database> loadDb() async {
     String dbPath = await getDatabasesPath();
     String path = join(dbPath, 'UniSchedule__second _year.db');
-    const int currentVersion = 3;
+    const int currentVersion = 4;
 
     final prefs = await SharedPreferences.getInstance();
     int savedVersion = prefs.getInt('db_version') ?? 0;
